@@ -12,6 +12,43 @@ Stormglass is the default provider. Set `STORMGLASS_API_KEY` in your shell or lo
 STORMGLASS_API_KEY=...
 ```
 
+## Package
+
+Build the distributable package:
+
+```bash
+npm run build
+```
+
+Preview the files that would be published:
+
+```bash
+npm run pack:dry
+```
+
+After publishing, install and run:
+
+```bash
+npm install -g surf-forecast-cli-mcp
+surf-forecast providers
+surf-forecast spots --region santa-cruz
+surf-forecast-mcp
+```
+
+Use the library API from TypeScript or ESM JavaScript:
+
+```ts
+import { SurfForecastService, resolveForecastPoint } from "surf-forecast-cli-mcp";
+
+const service = new SurfForecastService();
+const point = resolveForecastPoint({ spot: "pleasure-point" });
+const forecast = await service.getForecast({
+  point: point.point,
+  name: point.name,
+  hours: 12,
+});
+```
+
 ## Forecast CLI
 
 Fetch canonical surf data as JSON. Prefer `--spot` for known breaks; use `--lat` and `--lng` for custom points:

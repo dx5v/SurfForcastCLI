@@ -121,6 +121,12 @@ CLI and MCP callers can request display conversions later, but provider adapters
 
 ## Exposed Surfaces
 
+Package entry points:
+
+- Library API: `surf-forecast-cli-mcp`
+- CLI binary: `surf-forecast`
+- MCP binary: `surf-forecast-mcp`
+
 CLI:
 
 ```bash

@@ -1,17 +1,53 @@
 {
   "name": "surf-forecast-cli-mcp",
   "version": "0.1.0",
-  "private": true,
+  "description": "Surf forecast CLI, MCP server, and TypeScript library with pluggable forecast providers.",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "surf-forecast": "dist/cli.js",
+    "surf-forecast-mcp": "dist/mcp-server.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "docs"
+  ],
   "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json && node -e \"const fs = require('node:fs'); for (const file of ['dist/cli.js', 'dist/mcp-server.js']) fs.chmodSync(file, 0o755)\"",
     "forecast": "node --env-file-if-exists=.env --import tsx src/cli.ts forecast",
     "mcp": "node --env-file-if-exists=.env --import tsx src/mcp-server.ts",
+    "pack:dry": "npm run build && npm pack --dry-run",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build",
     "providers": "node --env-file-if-exists=.env --import tsx src/cli.ts providers",
     "regions": "node --env-file-if-exists=.env --import tsx src/cli.ts regions",
     "spots": "node --env-file-if-exists=.env --import tsx src/cli.ts spots",
     "test": "node --import tsx --test \"tests/**/*.test.ts\"",
     "typecheck": "tsc --noEmit"
   },
+  "keywords": [
+    "surf",
+    "forecast",
+    "mcp",
+    "cli",
+    "stormglass",
+    "open-meteo"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dx5v/SurfForcastCLI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dx5v/SurfForcastCLI/issues"
+  },
+  "homepage": "https://github.com/dx5v/SurfForcastCLI#readme",
   "engines": {
     "node": ">=20"
   },
