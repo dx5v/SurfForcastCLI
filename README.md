@@ -2,6 +2,10 @@
 
 Early spike for a surf forecast data service that can expose provider-backed ocean and wind data to agents through CLI and MCP interfaces.
 
+## Architecture
+
+The service layer is shaped around provider adapters that emit one canonical surf model. Default provider order is Stormglass first, then Open-Meteo fallback. See [docs/architecture.md](docs/architecture.md).
+
 ## Provider Probe
 
 Run raw provider requests before building the retrieval layer:
