@@ -30,9 +30,11 @@ npm run probe:providers -- --provider stormglass --stormglass-source sg --stormg
 
 ## Forecast CLI
 
-Fetch canonical surf data as JSON:
+Fetch canonical surf data as JSON. Prefer `--spot` for known breaks; use `--lat` and `--lng` for custom points:
 
 ```bash
+npm run forecast -- --spot steamer-lane --hours 12
+npm run forecast -- --spot pleasure-point --provider open-meteo --hours 12
 npm run forecast -- --lat 36.951 --lng -122.026 --hours 12
 ```
 
@@ -40,6 +42,12 @@ List provider configuration and capabilities:
 
 ```bash
 npm run providers
+```
+
+List known spot ids and aliases:
+
+```bash
+npm run spots
 ```
 
 ## MCP Server
@@ -58,7 +66,11 @@ Tools:
 - `get_tide_forecast`
 - `get_ocean_forecast`
 - `compare_surf_providers`
+- `list_surf_spots`
+- `resolve_surf_spot`
 - `list_surf_providers`
+
+Forecast tools accept either `spot` or both `lat` and `lng`.
 
 ## Tests
 

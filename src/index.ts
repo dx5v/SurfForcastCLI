@@ -4,4 +4,4 @@ export * from "./providers/registry.js";
 export * from "./providers/stormglass.js";
 export * from "./providers/types.js";
 export * from "./services/surf-forecast-service.js";
-
+export * from "./spots/catalog.js";

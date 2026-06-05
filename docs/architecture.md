@@ -124,9 +124,13 @@ CLI and MCP callers can request display conversions later, but provider adapters
 CLI:
 
 ```bash
+npm run forecast -- --spot steamer-lane --hours 12
 npm run forecast -- --lat 36.951 --lng -122.026 --hours 12
+npm run spots
 npm run providers
 ```
+
+Forecast surfaces accept either a known surf spot id/alias or raw coordinates. Spot resolution happens before provider selection, so providers only receive canonical coordinates.
 
 MCP stdio server:
 
@@ -142,6 +146,8 @@ MCP tools:
 - `get_tide_forecast`
 - `get_ocean_forecast`
 - `compare_surf_providers`
+- `list_surf_spots`
+- `resolve_surf_spot`
 - `list_surf_providers`
 
 ## Next Build Steps

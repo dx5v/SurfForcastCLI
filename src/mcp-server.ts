@@ -4,6 +4,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import * as z from "zod/v4";
 import {
+  listSurfSpots,
+  resolveForecastPoint,
+  resolveSurfSpot,
   SurfForecastService,
   SurfProviderError,
   type ProviderId,
@@ -21,8 +24,9 @@ type ProviderChoice = "auto" | "stormglass" | "open-meteo";
 type TideMode = "hourly" | "extremes" | "both";
 
 type BaseForecastToolArgs = {
-  lat: number;
-  lng: number;
+  spot?: string | undefined;
+  lat?: number | undefined;
+  lng?: number | undefined;
   name?: string | undefined;
   provider?: ProviderChoice | undefined;
   fallbackProviders?: ("stormglass" | "open-meteo")[] | undefined;
@@ -67,8 +71,12 @@ const fieldsSchema = z
   .describe("Optional subset of canonical surf fields.");
 
 const baseInputSchema = {
-  lat: z.number().describe("Latitude of the surf spot."),
-  lng: z.number().describe("Longitude of the surf spot."),
+  spot: z
+    .string()
+    .optional()
+    .describe("Known surf spot id or alias, e.g. steamer-lane or pleasure-point."),
+  lat: z.number().optional().describe("Latitude. Required only when spot is omitted."),
+  lng: z.number().optional().describe("Longitude. Required only when spot is omitted."),
   name: z.string().optional().describe("Optional human-readable spot name."),
   provider: providerSchema,
   fallbackProviders: fallbackProvidersSchema,
@@ -233,8 +241,9 @@ server.registerTool(
     description:
       "Fetch forecasts from multiple providers independently and return successes or provider-specific errors.",
     inputSchema: {
-      lat: z.number().describe("Latitude of the surf spot."),
-      lng: z.number().describe("Longitude of the surf spot."),
+      spot: baseInputSchema.spot,
+      lat: baseInputSchema.lat,
+      lng: baseInputSchema.lng,
       name: z.string().optional().describe("Optional human-readable spot name."),
       providers: z
         .array(z.enum(["stormglass", "open-meteo"]))
@@ -250,6 +259,7 @@ server.registerTool(
   },
   async (args) =>
     runTool(async () => {
+      const baseRequest = forecastRequestFromToolArgs(args, { fields: args.fields });
       const providers = args.providers?.length
         ? args.providers
         : (["stormglass", "open-meteo"] as const);
@@ -281,12 +291,46 @@ server.registerTool(
       return {
         comparison: {
           point: {
-            requested: { lat: args.lat, lng: args.lng },
-            ...(args.name ? { name: args.name } : {}),
+            requested: baseRequest.point,
+            ...(baseRequest.name ? { name: baseRequest.name } : {}),
           },
           providers: forecasts,
         },
       };
+    }),
+);
+
+server.registerTool(
+  "list_surf_spots",
+  {
+    title: "List Surf Spots",
+    description: "List known surf spots, aliases, coordinates, and lightweight preferences.",
+  },
+  async () =>
+    runTool(async () => ({
+      spots: listSurfSpots(),
+    })),
+);
+
+server.registerTool(
+  "resolve_surf_spot",
+  {
+    title: "Resolve Surf Spot",
+    description:
+      "Resolve a surf spot id or alias to the catalog entry that forecast tools use.",
+    inputSchema: {
+      spot: z.string().describe("Surf spot id or alias."),
+    },
+  },
+  async (args) =>
+    runTool(async () => {
+      const spot = resolveSurfSpot(args.spot);
+
+      if (!spot) {
+        throw new Error(`Unknown surf spot: ${args.spot}`);
+      }
+
+      return { spot };
     }),
 );
 
@@ -346,6 +390,12 @@ function forecastRequestFromToolArgs(
   } = {},
 ): SurfForecastRequest {
   const providerOptions: Record<string, unknown> = {};
+  const resolvedPoint = resolveForecastPoint({
+    spot: args.spot,
+    lat: args.lat,
+    lng: args.lng,
+    name: args.name,
+  });
 
   if (args.stormglassSource) {
     providerOptions.source = args.stormglassSource;
@@ -356,8 +406,8 @@ function forecastRequestFromToolArgs(
   }
 
   return {
-    point: { lat: args.lat, lng: args.lng },
-    ...(args.name ? { name: args.name } : {}),
+    point: resolvedPoint.point,
+    ...(resolvedPoint.name ? { name: resolvedPoint.name } : {}),
     ...(args.provider && args.provider !== "auto"
       ? { provider: args.provider as ProviderId }
       : {}),

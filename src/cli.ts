@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import {
+  listSurfSpots,
+  resolveForecastPoint,
   SurfForecastService,
   SurfProviderError,
   type ProviderId,
@@ -9,12 +11,6 @@ import {
 } from "./index.js";
 
 type CliArgs = Record<string, string>;
-
-const DEFAULT_POINT = {
-  name: "Steamer Lane, Santa Cruz",
-  lat: 36.951,
-  lng: -122.026,
-};
 
 const command = process.argv[2] ?? "forecast";
 const args = parseArgs(process.argv.slice(3));
@@ -27,6 +23,9 @@ try {
       break;
     case "providers":
       printProviders(service);
+      break;
+    case "spots":
+      printSpots();
       break;
     case "help":
     case "--help":
@@ -61,10 +60,16 @@ function printProviders(service: SurfForecastService): void {
   writeJson({ providers });
 }
 
+function printSpots(): void {
+  writeJson({ spots: listSurfSpots() });
+}
+
 function forecastRequestFromArgs(args: CliArgs): SurfForecastRequest {
-  const lat = numberArg(args, "lat", undefined) ?? DEFAULT_POINT.lat;
-  const lng = numberArg(args, "lng", undefined) ?? DEFAULT_POINT.lng;
-  const name = stringArg(args, "name", DEFAULT_POINT.name);
+  const spot = stringArg(args, "spot", undefined);
+  const lat = numberArg(args, "lat", undefined);
+  const lng = numberArg(args, "lng", undefined);
+  const name = stringArg(args, "name", undefined);
+  const resolvedPoint = resolveForecastPoint({ spot, lat, lng, name });
   const provider = stringArg(args, "provider", "auto");
   const fallbackProviders = listArg(args, "fallback").map((value) => value as ProviderId);
   const fields = listArg(args, "fields").map((value) => value as SurfDataField);
@@ -75,8 +80,8 @@ function forecastRequestFromArgs(args: CliArgs): SurfForecastRequest {
   const timezone = stringArg(args, "timezone", undefined);
 
   return {
-    point: { lat, lng },
-    ...(name ? { name } : {}),
+    point: resolvedPoint.point,
+    ...(resolvedPoint.name ? { name: resolvedPoint.name } : {}),
     ...(hours !== undefined ? { hours } : {}),
     ...(start ? { start } : {}),
     ...(end ? { end } : {}),
@@ -110,13 +115,17 @@ function printHelp(): void {
 Commands:
   forecast   Fetch a canonical surf forecast as JSON
   providers  List providers, capabilities, and config status
+  spots      List known surf spots and aliases
 
 Examples:
+  npm run forecast -- --spot steamer-lane --hours 12
+  npm run forecast -- --spot pleasure-point --provider open-meteo --hours 12
   npm run forecast -- --lat 36.951 --lng -122.026 --hours 12
-  npm run forecast -- --provider open-meteo --hours 12
+  npm run spots
   npm run providers
 
 Options:
+  --spot <spot-id-or-alias>
   --lat <number>
   --lng <number>
   --name <label>
