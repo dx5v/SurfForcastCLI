@@ -137,12 +137,18 @@ npm run mcp
 MCP tools:
 
 - `get_surf_forecast`
+- `get_wave_forecast`
+- `get_wind_forecast`
+- `get_tide_forecast`
+- `get_ocean_forecast`
+- `compare_surf_providers`
 - `list_surf_providers`
 
 ## Next Build Steps
 
-1. Add fixture-based provider conformance tests.
-2. Add display-unit formatting for CLI consumers, while keeping canonical provider output unchanged.
-3. Add surf-window scoring above the provider layer.
-4. Add more spots/config presets.
-5. Add package build output for installing the CLI and MCP server outside the repo.
+1. Add formal MCP output schemas for the projected tool responses.
+2. Optimize provider-native parameter selection by requested canonical fields.
+3. Add display-unit formatting for CLI consumers, while keeping canonical provider output unchanged.
+4. Add surf-window scoring above the provider layer.
+5. Add more spots/config presets.
+6. Add package build output for installing the CLI and MCP server outside the repo.

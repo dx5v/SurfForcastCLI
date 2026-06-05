@@ -53,6 +53,11 @@ npm run mcp
 Tools:
 
 - `get_surf_forecast`
+- `get_wave_forecast`
+- `get_wind_forecast`
+- `get_tide_forecast`
+- `get_ocean_forecast`
+- `compare_surf_providers`
 - `list_surf_providers`
 
 ## Tests
