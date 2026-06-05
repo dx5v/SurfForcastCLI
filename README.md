@@ -27,3 +27,30 @@ npm run probe:providers -- --lat 36.951 --lng -122.026 --hours 48 --sample 5
 npm run probe:providers -- --provider open-meteo
 npm run probe:providers -- --provider stormglass --stormglass-source sg --stormglass-datum MLLW
 ```
+
+## Forecast CLI
+
+Fetch canonical surf data as JSON:
+
+```bash
+npm run forecast -- --lat 36.951 --lng -122.026 --hours 12
+```
+
+List provider configuration and capabilities:
+
+```bash
+npm run providers
+```
+
+## MCP Server
+
+Start the stdio MCP server:
+
+```bash
+npm run mcp
+```
+
+Tools:
+
+- `get_surf_forecast`
+- `list_surf_providers`

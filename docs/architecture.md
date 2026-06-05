@@ -119,11 +119,30 @@ The canonical model uses stable internal units:
 
 CLI and MCP callers can request display conversions later, but provider adapters should emit canonical units only.
 
+## Exposed Surfaces
+
+CLI:
+
+```bash
+npm run forecast -- --lat 36.951 --lng -122.026 --hours 12
+npm run providers
+```
+
+MCP stdio server:
+
+```bash
+npm run mcp
+```
+
+MCP tools:
+
+- `get_surf_forecast`
+- `list_surf_providers`
+
 ## Next Build Steps
 
-1. Move raw Stormglass request logic from `scripts/probe-providers.ts` into `StormglassProvider`.
-2. Normalize Stormglass source-wrapped values into canonical hourly readings.
-3. Move Open-Meteo marine/weather joins into `OpenMeteoProvider`.
-4. Add fixture-based provider conformance tests.
-5. Add MCP and CLI surfaces over `SurfForecastService`.
-
+1. Add fixture-based provider conformance tests.
+2. Add display-unit formatting for CLI consumers, while keeping canonical provider output unchanged.
+3. Add surf-window scoring above the provider layer.
+4. Add more spots/config presets.
+5. Add package build output for installing the CLI and MCP server outside the repo.

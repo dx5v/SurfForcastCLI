@@ -4,15 +4,26 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "forecast": "node --env-file-if-exists=.env --import tsx src/cli.ts forecast",
+    "mcp": "node --env-file-if-exists=.env --import tsx src/mcp-server.ts",
+    "providers": "node --env-file-if-exists=.env --import tsx src/cli.ts providers",
     "probe:providers": "node --env-file-if-exists=.env --import tsx scripts/probe-providers.ts",
     "typecheck": "tsc --noEmit"
   },
   "engines": {
     "node": ">=20"
   },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.23.3",
+    "zod": "^4.1.13"
+  },
   "devDependencies": {
     "@types/node": "^25.9.1",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
   }
 }
