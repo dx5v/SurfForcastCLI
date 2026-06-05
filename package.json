@@ -1,6 +1,6 @@
 {
   "name": "surf-forecast-cli-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Agent-ready surf forecast CLI, MCP server, and TypeScript library for waves, wind, tides, and surf spot data.",
   "license": "MIT",
   "type": "module",

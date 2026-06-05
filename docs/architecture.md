@@ -127,6 +127,12 @@ Package entry points:
 - CLI binary: `surf-forecast`
 - MCP binary: `surf-forecast-mcp`
 
+Configuration:
+
+- `surf-forecast setup` writes `STORMGLASS_API_KEY` to user config by default.
+- CLI and MCP startup load user config and local `.env` before provider selection.
+- Existing environment variables take precedence over saved config.
+
 CLI:
 
 ```bash
@@ -135,6 +141,7 @@ npm run forecast -- --lat 36.951 --lng -122.026 --hours 12
 npm run spots
 npm run regions
 npm run providers
+surf-forecast setup
 ```
 
 Forecast surfaces accept either a known surf spot id/alias or raw coordinates. Spot resolution happens before provider selection, so providers only receive canonical coordinates.

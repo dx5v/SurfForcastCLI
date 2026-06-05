@@ -3,6 +3,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import * as z from "zod/v4";
+import { loadRuntimeEnv } from "./config/env.js";
 import {
   listSurfRegions,
   listSurfSpots,
@@ -21,6 +22,8 @@ import {
   projectWaveForecast,
   projectWindForecast,
 } from "./tools/projections.js";
+
+loadRuntimeEnv();
 
 type ProviderChoice = "auto" | "stormglass" | "open-meteo";
 

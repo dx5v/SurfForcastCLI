@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 
+import { stdin, stdout } from "node:process";
 import {
+  resolveSetupTargetPath,
+  shellExportCommand,
+  writeEnvValue,
+} from "./config/env.js";
+import {
+  loadRuntimeEnv,
   listSurfRegions,
   listSurfSpots,
   listSurfSpotsByRegion,
@@ -11,11 +18,13 @@ import {
   type SurfDataField,
   type SurfForecastRequest,
 } from "./index.js";
+import { STORMGLASS_API_KEY_ENV } from "./providers/stormglass.js";
 
 type CliArgs = Record<string, string>;
 
 const command = process.argv[2] ?? "forecast";
 const args = parseArgs(process.argv.slice(3));
+loadRuntimeEnv();
 const service = new SurfForecastService();
 
 try {
@@ -31,6 +40,9 @@ try {
       break;
     case "regions":
       printRegions();
+      break;
+    case "setup":
+      await runSetup(args);
       break;
     case "help":
     case "--help":
@@ -75,6 +87,52 @@ function printSpots(): void {
 
 function printRegions(): void {
   writeJson({ regions: listSurfRegions() });
+}
+
+async function runSetup(args: CliArgs): Promise<void> {
+  const apiKey =
+    stringArg(args, "stormglass-api-key", undefined) ??
+    stringArg(args, "key", undefined);
+  const target = stringArg(args, "target", "user");
+  const printExport = booleanArg(args, "print-export", false);
+  const resolvedApiKey =
+    apiKey ??
+    (stdin.isTTY && stdout.isTTY
+      ? await promptHidden("Stormglass API key: ")
+      : undefined);
+
+  if (!resolvedApiKey) {
+    throw new Error(
+      `Missing Stormglass API key. Set ${STORMGLASS_API_KEY_ENV}, pass --stormglass-api-key <key>, or run setup interactively.`,
+    );
+  }
+
+  if (printExport) {
+    writeJson({
+      setup: {
+        envVar: STORMGLASS_API_KEY_ENV,
+        command: shellExportCommand(STORMGLASS_API_KEY_ENV, resolvedApiKey),
+        persisted: false,
+      },
+    });
+    return;
+  }
+
+  const path = resolveSetupTargetPath(target);
+  const result = writeEnvValue(path, STORMGLASS_API_KEY_ENV, resolvedApiKey);
+  process.env[STORMGLASS_API_KEY_ENV] = resolvedApiKey;
+
+  writeJson({
+    setup: {
+      provider: "stormglass",
+      envVar: STORMGLASS_API_KEY_ENV,
+      target,
+      path: result.path,
+      created: result.created,
+      updated: result.updated,
+      configured: true,
+    },
+  });
 }
 
 function forecastRequestFromArgs(args: CliArgs): SurfForecastRequest {
@@ -130,6 +188,7 @@ Commands:
   providers  List providers, capabilities, and config status
   spots      List known surf spots and aliases
   regions    List known surf regions
+  setup      Configure a Stormglass API key for CLI and MCP use
 
 Examples:
   npm run forecast -- --spot steamer-lane --hours 12
@@ -139,6 +198,8 @@ Examples:
   npm run spots -- --region north-cal
   npm run regions
   npm run providers
+  surf-forecast setup
+  surf-forecast setup --target local
 
 Options:
   --spot <spot-id-or-alias>
@@ -153,6 +214,9 @@ Options:
   --fields <comma-separated fields>
   --stormglass-source <source>
   --stormglass-datum <MSL|MLLW>
+  --stormglass-api-key <key>
+  --target <user|local|path>
+  --print-export
 `);
 }
 
@@ -167,6 +231,7 @@ function printError(error: unknown): void {
             retryable: error.retryable,
             message: error.message,
             details: error.details,
+            hint: errorHint(error),
           },
         }
       : {
@@ -177,6 +242,17 @@ function printError(error: unknown): void {
         };
 
   process.stderr.write(`${JSON.stringify(payload, null, 2)}\n`);
+}
+
+function errorHint(error: SurfProviderError): string | undefined {
+  if (
+    error.code === "no_provider_succeeded" &&
+    JSON.stringify(error.details).includes(STORMGLASS_API_KEY_ENV)
+  ) {
+    return `Set ${STORMGLASS_API_KEY_ENV}, run surf-forecast setup, or choose --provider open-meteo.`;
+  }
+
+  return undefined;
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -244,6 +320,60 @@ function listArg(args: CliArgs, key: string): string[] {
     .filter(Boolean);
 }
 
+function booleanArg(args: CliArgs, key: string, fallback: boolean): boolean {
+  const raw = args[key];
+
+  if (raw === undefined) {
+    return fallback;
+  }
+
+  return raw === "true" || raw === "1" || raw === "yes";
+}
+
 function writeJson(value: unknown): void {
   process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
+}
+
+async function promptHidden(prompt: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const wasRaw = stdin.isRaw;
+    let value = "";
+
+    function cleanup(): void {
+      stdin.off("data", onData);
+      stdin.setRawMode(wasRaw);
+      stdin.pause();
+      stdout.write("\n");
+    }
+
+    function onData(chunk: Buffer | string): void {
+      for (const char of chunk.toString("utf8")) {
+        if (char === "\u0003") {
+          cleanup();
+          reject(new Error("Setup cancelled."));
+          return;
+        }
+
+        if (char === "\r" || char === "\n") {
+          cleanup();
+          resolve(value);
+          return;
+        }
+
+        if (char === "\u007f" || char === "\b") {
+          value = value.slice(0, -1);
+          continue;
+        }
+
+        if (char >= " ") {
+          value += char;
+        }
+      }
+    }
+
+    stdout.write(prompt);
+    stdin.setRawMode(true);
+    stdin.resume();
+    stdin.on("data", onData);
+  });
 }

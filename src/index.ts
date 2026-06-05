@@ -1,3 +1,4 @@
+export * from "./config/env.js";
 export * from "./domain/surf.js";
 export * from "./providers/open-meteo.js";
 export * from "./providers/registry.js";

@@ -30,6 +30,7 @@ Install and run:
 
 ```bash
 npm install -g surf-forecast-cli-mcp
+surf-forecast setup
 surf-forecast providers
 surf-forecast spots --region santa-cruz
 surf-forecast-mcp
@@ -47,6 +48,44 @@ const forecast = await service.getForecast({
   name: point.name,
   hours: 12,
 });
+```
+
+## Configuration
+
+Stormglass is optional but preferred. Open-Meteo works without credentials.
+
+Configure Stormglass for both the CLI and MCP server:
+
+```bash
+surf-forecast setup
+```
+
+By default, setup stores the key at `~/.config/surf-forecast/config.env`. You can also write a local `.env` in the current directory:
+
+```bash
+surf-forecast setup --target local
+```
+
+For non-interactive setup:
+
+```bash
+surf-forecast setup --stormglass-api-key <key>
+surf-forecast setup --stormglass-api-key <key> --target local
+surf-forecast setup --stormglass-api-key <key> --print-export
+```
+
+Environment variables still take precedence over saved config.
+
+The MCP server reads the same saved config file, so this works after setup:
+
+```json
+{
+  "mcpServers": {
+    "surf-forecast": {
+      "command": "surf-forecast-mcp"
+    }
+  }
+}
 ```
 
 ## Forecast CLI
