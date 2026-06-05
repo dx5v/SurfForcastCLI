@@ -54,3 +54,12 @@ Tools:
 
 - `get_surf_forecast`
 - `list_surf_providers`
+
+## Tests
+
+Run typecheck and no-quota mocked provider tests:
+
+```bash
+npm run typecheck
+npm run test
+```
