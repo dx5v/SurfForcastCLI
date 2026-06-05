@@ -7,6 +7,7 @@
     "forecast": "node --env-file-if-exists=.env --import tsx src/cli.ts forecast",
     "mcp": "node --env-file-if-exists=.env --import tsx src/mcp-server.ts",
     "providers": "node --env-file-if-exists=.env --import tsx src/cli.ts providers",
+    "regions": "node --env-file-if-exists=.env --import tsx src/cli.ts regions",
     "spots": "node --env-file-if-exists=.env --import tsx src/cli.ts spots",
     "probe:providers": "node --env-file-if-exists=.env --import tsx scripts/probe-providers.ts",
     "test": "node --import tsx --test \"tests/**/*.test.ts\"",

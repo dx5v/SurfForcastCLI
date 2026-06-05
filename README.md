@@ -44,10 +44,18 @@ List provider configuration and capabilities:
 npm run providers
 ```
 
-List known spot ids and aliases:
+List known spot ids and aliases, optionally scoped by a region:
 
 ```bash
 npm run spots
+npm run spots -- --region north-cal
+npm run spots -- --region san-mateo-coast
+```
+
+List known surf regions:
+
+```bash
+npm run regions
 ```
 
 ## MCP Server
@@ -67,10 +75,12 @@ Tools:
 - `get_ocean_forecast`
 - `compare_surf_providers`
 - `list_surf_spots`
+- `list_surf_regions`
 - `resolve_surf_spot`
 - `list_surf_providers`
 
-Forecast tools accept either `spot` or both `lat` and `lng`.
+Forecast tools accept either `spot` or both `lat` and `lng`. Discovery tools let agents
+avoid raw coordinates by listing regions first, then spots within a region.
 
 ## Tests
 

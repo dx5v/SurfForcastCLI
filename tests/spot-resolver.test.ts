@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  listSurfRegions,
   listSurfSpots,
+  listSurfSpotsByRegion,
   resolveForecastPoint,
+  resolveSurfRegion,
   resolveSurfSpot,
 } from "../src/index.js";
 
@@ -47,3 +50,25 @@ test("forecast point resolver requires a spot or both coordinates", () => {
   );
 });
 
+test("region catalog resolves ids and aliases", () => {
+  assert.equal(resolveSurfRegion("north-cal")?.name, "Northern California");
+  assert.equal(resolveSurfRegion("norcal")?.id, "north-cal");
+  assert.equal(resolveSurfRegion("half moon bay")?.id, "san-mateo-coast");
+  assert.ok(listSurfRegions().some((region) => region.id === "north-cal"));
+});
+
+test("region spot listing includes child-region spots", () => {
+  const northCalSpotIds = listSurfSpotsByRegion("north-cal").map((spot) => spot.id);
+  assert.ok(northCalSpotIds.includes("ocean-beach-sf"));
+  assert.ok(northCalSpotIds.includes("steamer-lane"));
+
+  const sanMateoSpotIds = listSurfSpotsByRegion("san-mateo-coast").map(
+    (spot) => spot.id,
+  );
+  assert.ok(sanMateoSpotIds.includes("mavericks"));
+  assert.equal(sanMateoSpotIds.includes("steamer-lane"), false);
+});
+
+test("region spot listing rejects unknown regions", () => {
+  assert.throws(() => listSurfSpotsByRegion("atlantis"), /Unknown surf region/);
+});

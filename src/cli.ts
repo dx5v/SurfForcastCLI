@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 import {
+  listSurfRegions,
   listSurfSpots,
+  listSurfSpotsByRegion,
   resolveForecastPoint,
   SurfForecastService,
   SurfProviderError,
@@ -26,6 +28,9 @@ try {
       break;
     case "spots":
       printSpots();
+      break;
+    case "regions":
+      printRegions();
       break;
     case "help":
     case "--help":
@@ -61,7 +66,15 @@ function printProviders(service: SurfForecastService): void {
 }
 
 function printSpots(): void {
-  writeJson({ spots: listSurfSpots() });
+  const region = stringArg(args, "region", undefined);
+  writeJson({
+    ...(region ? { region } : {}),
+    spots: region ? listSurfSpotsByRegion(region) : listSurfSpots(),
+  });
+}
+
+function printRegions(): void {
+  writeJson({ regions: listSurfRegions() });
 }
 
 function forecastRequestFromArgs(args: CliArgs): SurfForecastRequest {
@@ -116,12 +129,15 @@ Commands:
   forecast   Fetch a canonical surf forecast as JSON
   providers  List providers, capabilities, and config status
   spots      List known surf spots and aliases
+  regions    List known surf regions
 
 Examples:
   npm run forecast -- --spot steamer-lane --hours 12
   npm run forecast -- --spot pleasure-point --provider open-meteo --hours 12
   npm run forecast -- --lat 36.951 --lng -122.026 --hours 12
   npm run spots
+  npm run spots -- --region north-cal
+  npm run regions
   npm run providers
 
 Options:

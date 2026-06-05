@@ -4,7 +4,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import * as z from "zod/v4";
 import {
+  listSurfRegions,
   listSurfSpots,
+  listSurfSpotsByRegion,
   resolveForecastPoint,
   resolveSurfSpot,
   SurfForecastService,
@@ -304,11 +306,31 @@ server.registerTool(
   "list_surf_spots",
   {
     title: "List Surf Spots",
-    description: "List known surf spots, aliases, coordinates, and lightweight preferences.",
+    description:
+      "List known surf spots, aliases, coordinates, and lightweight preferences. Optionally filter by region id or alias.",
+    inputSchema: {
+      region: z
+        .string()
+        .optional()
+        .describe("Optional surf region id or alias, e.g. north-cal or san-mateo-coast."),
+    },
+  },
+  async (args) =>
+    runTool(async () => ({
+      ...(args.region ? { region: args.region } : {}),
+      spots: args.region ? listSurfSpotsByRegion(args.region) : listSurfSpots(),
+    })),
+);
+
+server.registerTool(
+  "list_surf_regions",
+  {
+    title: "List Surf Regions",
+    description: "List known surf regions and parent/child groupings.",
   },
   async () =>
     runTool(async () => ({
-      spots: listSurfSpots(),
+      regions: listSurfRegions(),
     })),
 );
 
