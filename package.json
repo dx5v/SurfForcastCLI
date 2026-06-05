@@ -2,6 +2,7 @@
   "name": "surf-forecast-cli-mcp",
   "version": "0.1.0",
   "description": "Surf forecast CLI, MCP server, and TypeScript library with pluggable forecast providers.",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
