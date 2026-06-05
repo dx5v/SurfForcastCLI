@@ -1,6 +1,6 @@
 # Surf Forecast CLI/MCP
 
-A surf forecast data service that exposes provider-backed ocean and wind data to agents through CLI and MCP interfaces.
+Agent-ready surf forecast CLI, MCP server, and TypeScript library for waves, wind, tides, and surf spot data.
 
 ## Architecture
 
@@ -26,7 +26,7 @@ Preview the files that would be published:
 npm run pack:dry
 ```
 
-After publishing, install and run:
+Install and run:
 
 ```bash
 npm install -g surf-forecast-cli-mcp
