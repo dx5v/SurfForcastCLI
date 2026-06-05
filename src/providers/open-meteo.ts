@@ -15,7 +15,6 @@ import {
   numberOrUndefined,
 } from "./normalization.js";
 import {
-  SurfProviderError,
   type ProviderCapabilities,
   type ProviderRuntimeContext,
   type SurfDataProvider,

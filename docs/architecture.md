@@ -127,6 +127,7 @@ CLI:
 npm run forecast -- --spot steamer-lane --hours 12
 npm run forecast -- --lat 36.951 --lng -122.026 --hours 12
 npm run spots
+npm run regions
 npm run providers
 ```
 
@@ -147,6 +148,7 @@ MCP tools:
 - `get_ocean_forecast`
 - `compare_surf_providers`
 - `list_surf_spots`
+- `list_surf_regions`
 - `resolve_surf_spot`
 - `list_surf_providers`
 

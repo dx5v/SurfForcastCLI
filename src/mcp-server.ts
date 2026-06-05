@@ -23,7 +23,6 @@ import {
 } from "./tools/projections.js";
 
 type ProviderChoice = "auto" | "stormglass" | "open-meteo";
-type TideMode = "hourly" | "extremes" | "both";
 
 type BaseForecastToolArgs = {
   spot?: string | undefined;
