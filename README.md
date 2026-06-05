@@ -10,10 +10,10 @@ Run raw provider requests before building the retrieval layer:
 npm run probe:providers
 ```
 
-The probe is written in TypeScript. Open-Meteo works without credentials. Stormglass is skipped unless an API key is available:
+The probe is written in TypeScript. Open-Meteo works without credentials. Stormglass is skipped unless `STORMGLASS_API_KEY` is set in your shell or local `.env` file:
 
-```bash
-STORMGLASS_API_KEY=... npm run probe:providers -- --provider stormglass
+```env
+STORMGLASS_API_KEY=...
 ```
 
 Useful options:

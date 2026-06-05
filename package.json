@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "probe:providers": "tsx scripts/probe-providers.ts",
+    "probe:providers": "node --env-file-if-exists=.env --import tsx scripts/probe-providers.ts",
     "typecheck": "tsc --noEmit"
   },
   "engines": {
